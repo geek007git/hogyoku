@@ -2,7 +2,7 @@
   "name": "hogyoku-rag",
   "version": "1.0.0",
   "private": true,
-  "description": "Production-oriented multimodal RAG workspace with cited, verified answers.",
+  "description": "Multimodal RAG workspace with cited, verified answers.",
   "type": "module",
   "engines": {
     "node": ">=22.0.0"
@@ -11,11 +11,13 @@
     "dev": "tsx watch src/server.ts",
     "dev:worker": "tsx watch src/worker.ts",
     "build": "tsc -p tsconfig.json",
-    "start": "node dist/server.js",
-    "start:worker": "node dist/worker.js",
+    "start": "node dist/src/server.js",
+    "start:worker": "node dist/src/worker.js",
     "db:migrate": "tsx src/db/migrate.ts",
     "test": "node --import tsx --test tests/**/*.test.ts",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "verify": "bash scripts/verify.sh",
+    "evaluate": "python scripts/evaluate_retrieval.py evaluations/example.jsonl"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1068.0",

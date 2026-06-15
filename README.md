@@ -1,9 +1,12 @@
 # Hogyoku RAG
 
-Hogyoku is a production-oriented multimodal RAG web application for private
-research libraries. It ingests PDFs, scans, images, Markdown, CSV, JSON, and
-plain text; performs OCR and visual extraction; runs hybrid retrieval; and
-returns cited answers with a separate claim-verification pass.
+[![CI](https://github.com/geek007git/hogyoku/actions/workflows/ci.yml/badge.svg)](https://github.com/geek007git/hogyoku/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+Hogyoku is a multimodal RAG web application for private research libraries. It
+ingests PDFs, scans, images, Markdown, CSV, JSON, and plain text; performs OCR
+and visual extraction; runs hybrid retrieval; and returns cited answers with a
+separate claim-verification pass.
 
 ## Architecture
 
@@ -32,6 +35,12 @@ The application works without a model key using deterministic local embeddings
 and extractive answers. Configure a provider key for generated and independently
 verified answers.
 
+On Linux, macOS, WSL, or Git Bash, bootstrap development with:
+
+```bash
+./scripts/bootstrap.sh
+```
+
 ## Local Development
 
 Start infrastructure:
@@ -50,11 +59,24 @@ cmd /c npm run dev:worker
 
 ## Quality Checks
 
-```powershell
-cmd /c npm run typecheck
-cmd /c npm test
-cmd /c npm run build
+```bash
+./scripts/verify.sh
 ```
+
+CI runs TypeScript checks, Node tests, dependency auditing, Bash syntax checks,
+Compose validation, and Python retrieval evaluation on every pull request.
+
+## Retrieval Evaluation
+
+The dependency-free Python evaluator reports recall at configurable cutoffs and
+mean reciprocal rank from JSONL retrieval output:
+
+```bash
+python scripts/evaluate_retrieval.py evaluations/example.jsonl
+python scripts/evaluate_retrieval.py results.jsonl --k 1 5 10 20
+```
+
+Each JSONL row contains `question`, `relevant_ids`, and `retrieved_ids`.
 
 ## Request Lifecycle
 
@@ -77,3 +99,26 @@ Use managed PostgreSQL with the `vector` extension, managed Redis, and private
 S3-compatible storage. Set all values from `.env.example` in the deployment
 secret manager. Run at least one worker independently from the web service so
 OCR cannot block HTTP traffic.
+
+For a Compose deployment with environment validation and health checks:
+
+```bash
+./scripts/deploy.sh
+```
+
+## Repository Layout
+
+```text
+.
+|-- public/               Browser application
+|-- src/
+|   |-- db/               PostgreSQL client and migrations
+|   |-- http/             Auth, document, and thread APIs
+|   |-- lib/              Storage, sessions, jobs, and chunking
+|   `-- services/         Extraction, retrieval, generation, verification
+|-- scripts/              Bash operations and Python evaluation tools
+|-- evaluations/          Retrieval benchmark datasets
+|-- tests/                Node test suite
+|-- docker-compose.yml    Complete local service topology
+`-- Dockerfile            API and worker container image
+```
