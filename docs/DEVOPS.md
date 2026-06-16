@@ -76,8 +76,26 @@ GitHub Actions validates:
 - TypeScript type checks, tests, build, and npm audit
 - Bash script syntax
 - Python retrieval evaluation
+- Python offline RAG and security guardrails
 - Docker Compose config
 - Rust formatting and tests
 - Terraform formatting, init, and validation
 - Ansible syntax checks and linting
 - Nix flake checks
+
+## Offline Python Guardrails
+
+The `python/hogyoku_guardrails` toolkit costs zero model credits. It only reads
+local files and JSONL fixtures:
+
+```bash
+PYTHONPATH=python python -m hogyoku_guardrails.security_scan --root .
+PYTHONPATH=python python -m hogyoku_guardrails.citation_audit evaluations/answers.example.jsonl
+PYTHONPATH=python python -m hogyoku_guardrails.chunk_audit evaluations/chunks.example.jsonl
+PYTHONPATH=python python -m hogyoku_guardrails.rag_lint evaluations/rag_answers.example.jsonl
+PYTHONPATH=python python -m hogyoku_guardrails.security_report --root .
+```
+
+Use these before committing dataset changes, prompt changes, or infrastructure
+changes. They check for leaked secrets, unsupported cited claims, weak chunk
+shape, unsafe answer behavior, and missing security controls.

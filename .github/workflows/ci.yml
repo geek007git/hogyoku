@@ -34,6 +34,15 @@ jobs:
         run: bash -n scripts/*.sh
       - name: Run retrieval evaluation
         run: python scripts/evaluate_retrieval.py evaluations/example.jsonl
+      - name: Run offline Python guardrails
+        env:
+          PYTHONPATH: python
+        run: |
+          python -m hogyoku_guardrails.security_scan --root .
+          python -m hogyoku_guardrails.citation_audit evaluations/answers.example.jsonl
+          python -m hogyoku_guardrails.chunk_audit evaluations/chunks.example.jsonl --min-chars 80
+          python -m hogyoku_guardrails.rag_lint evaluations/rag_answers.example.jsonl
+          python -m hogyoku_guardrails.security_report --root .
       - name: Validate Compose configuration
         run: docker compose config --quiet
 

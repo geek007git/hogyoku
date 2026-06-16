@@ -17,7 +17,8 @@
     "test": "node --import tsx --test tests/**/*.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "verify": "bash scripts/verify.sh",
-    "evaluate": "python scripts/evaluate_retrieval.py evaluations/example.jsonl"
+    "evaluate": "python scripts/evaluate_retrieval.py evaluations/example.jsonl",
+    "guardrails": "python scripts/run_guardrails.py"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1068.0",

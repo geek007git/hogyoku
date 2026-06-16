@@ -34,8 +34,21 @@ conservative.
 
 1. Rotate every credential that was ever pasted outside a secret manager.
 2. Generate a fresh `SESSION_SECRET`.
-3. Run `npm run verify`.
+3. Run `npm run verify` and the offline Python guardrails.
 4. Run `terraform plan` or `./scripts/deploy.sh`, depending on target.
 5. Confirm `/api/health` is reachable.
 6. Upload a small test document and confirm ingestion, retrieval, citations,
    and verification.
+
+## Offline Scanners
+
+The Python guardrail toolkit is standard-library only and does not call any AI
+provider:
+
+- `security_scan`: scans source files for committed credentials and risky
+  deployment settings.
+- `citation_audit`: checks whether cited answer claims overlap with cited
+  evidence.
+- `chunk_audit`: reports chunk length and duplicate risks.
+- `rag_lint`: checks that unsupported answers clearly refuse or caveat.
+- `security_report`: summarizes security controls present in the repository.

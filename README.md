@@ -18,6 +18,7 @@ separate claim-verification pass.
 - **Parsing:** PDF.js, Sharp, and Tesseract
 - **Models:** Google Gemini chat, vision, and embeddings
 - **Infrastructure:** Terraform, Ansible, Docker, and Nix
+- **Offline guardrails:** Python RAG and security scanners with no model calls
 - **Security:** Scrypt passwords, opaque hashed sessions, secure cookies,
   origin checks, rate limits, CSP, upload limits, and per-user data isolation
 
@@ -66,7 +67,8 @@ cmd /c npm run dev:worker
 ```
 
 CI runs TypeScript checks, Node tests, dependency auditing, Bash syntax checks,
-Compose validation, and Python retrieval evaluation on every pull request.
+Compose validation, Python retrieval evaluation, and offline Python guardrails on
+every pull request.
 
 ## Retrieval Evaluation
 
@@ -79,6 +81,17 @@ python scripts/evaluate_retrieval.py results.jsonl --k 1 5 10 20
 ```
 
 Each JSONL row contains `question`, `relevant_ids`, and `retrieved_ids`.
+
+Additional Python guardrails live in `python/hogyoku_guardrails` and use no
+external APIs or model credits:
+
+```bash
+PYTHONPATH=python python -m hogyoku_guardrails.security_scan --root .
+PYTHONPATH=python python -m hogyoku_guardrails.citation_audit evaluations/answers.example.jsonl
+PYTHONPATH=python python -m hogyoku_guardrails.chunk_audit evaluations/chunks.example.jsonl
+PYTHONPATH=python python -m hogyoku_guardrails.rag_lint evaluations/rag_answers.example.jsonl
+PYTHONPATH=python python -m hogyoku_guardrails.security_report --root .
+```
 
 ## Request Lifecycle
 
@@ -123,6 +136,7 @@ For a Compose deployment with environment validation and health checks:
 |   |-- lib/              Storage, sessions, jobs, and chunking
 |   `-- services/         Extraction, retrieval, generation, verification
 |-- scripts/              Bash operations and Python evaluation tools
+|-- python/               Offline RAG and security guardrails
 |-- services/docproc/     Rust chunking utility
 |-- infra/terraform/      AWS ECS, S3, ECR, IAM, logs, and secrets
 |-- ansible/              VPS hardening and Compose deployment playbooks
