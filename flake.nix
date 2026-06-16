@@ -26,7 +26,6 @@
               clippy
               terraform
               ansible
-              ansible-lint
               python312
               shellcheck
               docker-client

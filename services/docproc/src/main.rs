@@ -97,8 +97,9 @@ fn push_chunk(chunks: &mut Vec<Chunk>, sentences: &[String], page_number: u32) {
     let hash = Sha256::digest(content.as_bytes());
     let content_hash = format!("{hash:x}");
     let ordinal = chunks.len();
+    let short_hash = &content_hash[..12];
     chunks.push(Chunk {
-        id: format!("page-{page_number}-chunk-{ordinal}-{short_hash}", short_hash = &content_hash[..12]),
+        id: format!("page-{page_number}-chunk-{ordinal}-{short_hash}"),
         page_number,
         ordinal,
         content_hash,
