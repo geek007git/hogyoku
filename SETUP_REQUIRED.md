@@ -71,3 +71,10 @@ Create separate deployments from the same image:
 
 - Web command: `node dist/src/db/migrate.js && node dist/src/server.js`
 - Worker command: `node dist/src/worker.js`
+
+For infrastructure paths, read:
+
+- `docs/DEVOPS.md`
+- `docs/SECURITY.md`
+- `infra/terraform/terraform.tfvars.example`
+- `ansible/inventory.example.ini`

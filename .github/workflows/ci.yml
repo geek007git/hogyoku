@@ -36,3 +36,58 @@ jobs:
         run: python scripts/evaluate_retrieval.py evaluations/example.jsonl
       - name: Validate Compose configuration
         run: docker compose config --quiet
+
+  rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Test
+        run: cargo test --workspace
+
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: infra/terraform
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - name: Format
+        run: terraform fmt -check -recursive
+      - name: Init
+        run: terraform init -backend=false -input=false
+      - name: Validate
+        run: terraform validate
+
+  ansible:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ansible
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Ansible tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible ansible-lint
+          ansible-galaxy collection install -r requirements.yml
+      - name: Syntax check hardening playbook
+        run: ansible-playbook --syntax-check playbooks/harden.yml
+      - name: Syntax check deployment playbook
+        run: ansible-playbook --syntax-check playbooks/deploy-compose.yml
+      - name: Lint
+        run: ansible-lint playbooks
+
+  nix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v31
+      - name: Validate flake
+        run: nix flake check

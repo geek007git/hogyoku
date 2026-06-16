@@ -73,6 +73,15 @@ services:
       api:
         condition: service_healthy
 
+  docproc:
+    profiles: ["tools"]
+    build:
+      context: .
+      dockerfile: services/docproc/Dockerfile
+    command: ["/data/sample_document.txt", "1"]
+    volumes:
+      - ./evaluations:/data:ro
+
   postgres:
     image: pgvector/pgvector:pg16
     environment:

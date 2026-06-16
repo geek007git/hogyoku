@@ -11,11 +11,13 @@ separate claim-verification pass.
 ## Architecture
 
 - **Web/API:** Fastify and a dependency-free browser client
+- **Doc processing:** Rust utility for deterministic chunk hashing
 - **Database:** PostgreSQL with `pgvector`, HNSW, and full-text search
 - **Jobs:** BullMQ on Redis with retry and backoff
 - **Files:** Private S3-compatible object storage
 - **Parsing:** PDF.js, Sharp, and Tesseract
 - **Models:** Google Gemini chat, vision, and embeddings
+- **Infrastructure:** Terraform, Ansible, Docker, and Nix
 - **Security:** Scrypt passwords, opaque hashed sessions, secure cookies,
   origin checks, rate limits, CSP, upload limits, and per-user data isolation
 
@@ -90,6 +92,10 @@ Each JSONL row contains `question`, `relevant_ids`, and `retrieved_ids`.
 
 ## Deployment
 
+See [docs/DEVOPS.md](docs/DEVOPS.md) for Compose, Terraform, Ansible, Nix, and
+CI details. See [docs/SECURITY.md](docs/SECURITY.md) for secret handling and
+hardening notes.
+
 Build one container image and deploy it twice:
 
 - Web: `node dist/src/db/migrate.js && node dist/src/server.js`
@@ -117,6 +123,10 @@ For a Compose deployment with environment validation and health checks:
 |   |-- lib/              Storage, sessions, jobs, and chunking
 |   `-- services/         Extraction, retrieval, generation, verification
 |-- scripts/              Bash operations and Python evaluation tools
+|-- services/docproc/     Rust chunking utility
+|-- infra/terraform/      AWS ECS, S3, ECR, IAM, logs, and secrets
+|-- ansible/              VPS hardening and Compose deployment playbooks
+|-- docs/                 DevOps and security guides
 |-- evaluations/          Retrieval benchmark datasets
 |-- tests/                Node test suite
 |-- docker-compose.yml    Complete local service topology
