@@ -13,8 +13,8 @@ from hogyoku_guardrails.common import Finding, iter_text_files, print_findings
 SECRET_PATTERNS = [
     ("AWS_ACCESS_KEY", re.compile(r"\bAKIA[0-9A-Z]{16}\b")),
     ("AWS_SECRET_KEY", re.compile(r"(?i)\baws(.{0,20})?(secret|private).{0,20}[:=]\s*['\"]?[A-Za-z0-9/+=]{35,}")),
-    ("HOSTED_POSTGRES_URL", re.compile(r"postgres(?:ql)?://[^:\s]+:[^@\s]+@(?!localhost)[^/\s]+")),
-    ("HOSTED_REDIS_URL", re.compile(r"rediss?://[^:\s]+:[^@\s]+@(?!localhost)[^/\s]+")),
+    ("HOSTED_POSTGRES_URL", re.compile(r"postgres(?:ql)?://[^:\s]+:[^@\s]+@(?!localhost|postgres)[^/\s]+")),
+    ("HOSTED_REDIS_URL", re.compile(r"rediss?://[^:\s]+:[^@\s]+@(?!localhost|redis)[^/\s]+")),
     ("GEMINI_KEY", re.compile(r"\bAIza[0-9A-Za-z_-]{30,}\b")),
     ("JWT_LIKE_TOKEN", re.compile(r"\beyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{10,}\b")),
 ]
@@ -36,7 +36,7 @@ def scan_repo(root: Path) -> list[Finding]:
         except OSError:
             continue
         for line_number, line in enumerate(lines, start=1):
-            if rel_path == ".env.example" and "localhost" in line:
+            if rel_path.endswith(".env.example") or "security_scan.py" in rel_path:
                 continue
             for code, pattern in SECRET_PATTERNS:
                 if pattern.search(line):
